@@ -1,5 +1,6 @@
 
 from libultimate import Controller, Action, Fighter, Stage, TrainingMode
+from yuzulib import Runner
 from .screen import Screen
 import gym
 import numpy as np
@@ -23,7 +24,7 @@ action_list = [
     Action.ACTION_DOWN_SPECIAL,
     Action.ACTION_GRAB,
     Action.ACTION_SHIELD,
-    Action.ACTION_JAMP,
+    Action.ACTION_JUMP,
     Action.ACTION_SHORT_HOP,
     #Action.ACTION_UP_TAUNT,
     #Action.ACTION_DOWN_TAUNT,
@@ -51,21 +52,18 @@ class UltimateEnv(gym.Env):
         super().__init__()
         self.game_path = game_path
         self.dlc_dir = dlc_dir
-        self.action_space = gym.spaces.Discrete(len(action_list))  # 東西南北
-        self.observation_space = gym.spaces.Box(
-            low=0,
-            high=len(self.FIELD_TYPES),
-            shape=self.MAP.shape
-        )
+        self.action_space = gym.spaces.Discrete(len(action_list)) 
         self.controller, self.screen, self.training_mode = self._setup()
         self.prev_observation, self.prev_info = self._reset()
 
     def _setup(self):
+        runner = Runner(self.game_path, self.dlc_dir)
+        runner.run()
         controller = Controller()
         controller.move_to_home()
 
         training_mode = TrainingMode(
-            controller=self.controller,
+            controller=controller,
             stage=Stage.STAGE_FINAL_DESTINATION, 
             player=Fighter.FIGHTER_MARIO,
             cpu=Fighter.FIGHTER_DONKEY_KONG,
@@ -75,7 +73,7 @@ class UltimateEnv(gym.Env):
         training_mode.start()
         time.sleep(1)
         screen = Screen()
-        self.screen.run()
+        screen.run()
         time.sleep(1)
         return controller, screen, training_mode
 
