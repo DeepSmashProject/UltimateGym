@@ -6,10 +6,6 @@ class Screen(YuzuScreen):
         self.frame = None
         self.fps = 0
 
-    def run(self):
-        self.capture()
-
-
     def _callback(self, frame, fps):
         #print("callback!", frame[0][0], fps)
         self.frame = frame

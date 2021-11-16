@@ -57,7 +57,8 @@ class UltimateEnv(gym.Env):
         self.prev_observation, self.prev_info = self._reset()
 
     def _setup(self):
-        runner = Runner(self.game_path, self.dlc_dir)
+        screen = Screen()
+        runner = Runner(self.game_path, self.dlc_dir, screen)
         runner.run()
         controller = Controller()
         controller.move_to_home()
@@ -71,9 +72,6 @@ class UltimateEnv(gym.Env):
         )
         print("Training Mode")
         training_mode.start()
-        time.sleep(1)
-        screen = Screen()
-        screen.run()
         time.sleep(1)
         return controller, screen, training_mode
 
