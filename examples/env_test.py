@@ -33,7 +33,7 @@ action_list = [
     Action.ACTION_DOWN_SPECIAL,
     Action.ACTION_GRAB,
     Action.ACTION_SHIELD,
-    Action.ACTION_JAMP,
+    Action.ACTION_JUMP,
     Action.ACTION_SHORT_HOP,
     #Action.ACTION_UP_TAUNT,
     #Action.ACTION_DOWN_TAUNT,
