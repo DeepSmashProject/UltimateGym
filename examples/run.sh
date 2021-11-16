@@ -1,0 +1,1 @@
+python3 env_test.py -g /workspace/games/SSBU/Super\ Smash\ Bros\ Ultimate\ \[v0\].nsp -d /workspace/games/SSBU/DLC/
