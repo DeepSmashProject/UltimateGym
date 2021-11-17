@@ -8,6 +8,15 @@ import os
 from pathlib import Path
 import cv2
 
+
+from mss import mss
+mon = {'left': 0, 'top': 0, 'width': 200, 'height': 100}
+data_path = Path(os.path.dirname(__file__)).resolve()
+with mss() as sct:
+    img = sct.grab(mon)
+    cv2.imwrite("{}/screen.png".format(str(data_path)), img)
+
+os.exit(1)
 parser = argparse.ArgumentParser()
 parser.add_argument('-g', '--game', help="game path: ex. /path/to/game[v0].nsp")
 parser.add_argument('-d', '--dlc', help="dlc dir: ex. /path/to/dlc/")
