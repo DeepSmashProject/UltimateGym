@@ -63,4 +63,5 @@ for k in range(10):
         action = random.choice(action_list)
         next_obs, reward, done, info = env.step(action)
         print("episode: {}, step: {}, obs: {}".format(k, i, next_obs[0][0]))
+env.close()
 print("finished!")

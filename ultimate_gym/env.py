@@ -97,6 +97,9 @@ class UltimateEnv(gym.Env):
         else:
             print("Info: {}".format(self.prev_info))
 
+    def close(self):
+        self.screen.close()
+
     def _observe(self):
         frame, fps = self.screen.get()
         # resolution = 512x512 grayscale, 
