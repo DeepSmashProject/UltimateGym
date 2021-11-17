@@ -48,7 +48,7 @@ action_list = [
 ]
 
 class UltimateEnv(gym.Env):
-    def __init__(self, game_path: str, dlc_dir: str):
+    def __init__(self, game_path: str, dlc_dir: str, without_setup: bool = False):
         super().__init__()
         self.game_path = game_path
         self.dlc_dir = dlc_dir
@@ -63,7 +63,8 @@ class UltimateEnv(gym.Env):
             cpu=Fighter.FIGHTER_DONKEY_KONG,
             cpu_level=7,
         )
-        self._setup()
+        if not without_setup:
+            self._setup()
         self.prev_observation, self.prev_info = self.reset()
 
     def _setup(self):
