@@ -5,6 +5,8 @@ import time
 import random
 import argparse
 import os
+from pathlib import Path
+import cv2
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-g', '--game', help="game path: ex. /path/to/game[v0].nsp")
@@ -55,7 +57,7 @@ action_list = [
     Action.ACTION_NO_OPERATION
 ]
 
-screen = Screen(fps=30)
+screen = Screen(fps=1)
 controller = Controller()
 training_mode = TrainingMode(
     controller=controller,
@@ -64,13 +66,14 @@ training_mode = TrainingMode(
     cpu=Fighter.FIGHTER_DONKEY_KONG,
     cpu_level=7,
 )
-
+data_path = Path(os.path.dirname(__file__)).joinpath('data/').resolve()
 env = UltimateEnv(args.game, args.dlc, screen, controller, training_mode, without_setup=False)
 for k in range(10):
     obs = env.reset()
     for i in range(10):
         action = random.choice(action_list)
         next_obs, reward, done, info = env.step(action)
+        cv2.imwrite("{}/screen_{}.png".format(str(data_path), i), next_obs)
         print("episode: {}, step: {}, obs: {}".format(k, i, next_obs[100][100]))
 env.close()
 print("finished!")
