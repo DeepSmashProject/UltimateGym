@@ -53,27 +53,26 @@ class UltimateEnv(gym.Env):
         self.game_path = game_path
         self.dlc_dir = dlc_dir
         self.action_space = gym.spaces.Discrete(len(action_list)) 
-        self.controller, self.screen, self.training_mode = self._setup()
-        self.prev_observation, self.prev_info = self.reset()
-
-    def _setup(self):
-        screen = Screen()
-        runner = Runner(self.game_path, self.dlc_dir, screen)
-        runner.run()
-        controller = Controller()
-        controller.move_to_home()
-
-        training_mode = TrainingMode(
-            controller=controller,
+        self.screen = Screen()
+        self.screen.run()
+        self.controller = Controller()
+        self.training_mode = TrainingMode(
+            controller=self.controller,
             stage=Stage.STAGE_FINAL_DESTINATION, 
             player=Fighter.FIGHTER_MARIO,
             cpu=Fighter.FIGHTER_DONKEY_KONG,
             cpu_level=7,
         )
+        self._setup()
+        self.prev_observation, self.prev_info = self.reset()
+
+    def _setup(self):
+        runner = Runner(self.game_path, self.dlc_dir)
+        runner.run()
+        self.controller.move_to_home()
+        self.training_mode.start()
         print("Training Mode")
-        training_mode.start()
         time.sleep(1)
-        return controller, screen, training_mode
 
     def reset(self):
         # click reset button
