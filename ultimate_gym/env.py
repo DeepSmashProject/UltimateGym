@@ -97,7 +97,8 @@ class UltimateEnv(gym.Env):
     def _observe(self):
         frame, fps = self.screen.get()
         # resolution = 512x512 grayscale, 
-        observation = frame
+        observation = np.squeeze(frame, 3)
+        print("obs shape", observation.shape)
         # remove background color
         damage = self._get_damage(observation)
         kill = self._get_kill(observation)
@@ -148,8 +149,7 @@ class UltimateEnv(gym.Env):
         img_mask = cv2.inRange(img, lower, upper)
         img_mask = cv2.bitwise_not(img_mask,img_mask)
         img = cv2.bitwise_and(img, img, mask=img_mask)
-        print(img)
-        cv2.imwrite("damage_remove_black.png", img)
+        #cv2.imwrite("damage_remove_black.png", img)
         u, counts = np.unique(img[:, :, 0], return_counts=True)
         b = u[np.argmax(counts[1:])]
         u, counts = np.unique(img[:, :, 1], return_counts=True)
