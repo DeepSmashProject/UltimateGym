@@ -2,8 +2,8 @@ from yuzulib import Screen as YuzuScreen
 from threading import (Event)
 
 class Screen(YuzuScreen):
-    def __init__(self):
-        super().__init__(self._callback, fps=2)
+    def __init__(self, fps=60):
+        super().__init__(self._callback, fps=fps)
         self.current_frame = None
         self.current_fps = 0
         self.event = Event()

@@ -1,7 +1,6 @@
 
 from ultimate_gym import Screen, UltimateEnv
-from yuzulib import Runner
-from libultimate import Controller, Action
+from libultimate import Controller, Action, Fighter, Stage, TrainingMode
 import time
 import random
 import argparse
@@ -56,7 +55,17 @@ action_list = [
     Action.ACTION_NO_OPERATION
 ]
 
-env = UltimateEnv(args.game, args.dlc)
+screen = Screen(fps=30)
+controller = Controller()
+training_mode = TrainingMode(
+    controller=controller,
+    stage=Stage.STAGE_FINAL_DESTINATION, 
+    player=Fighter.FIGHTER_MARIO,
+    cpu=Fighter.FIGHTER_DONKEY_KONG,
+    cpu_level=7,
+)
+
+env = UltimateEnv(args.game, args.dlc, screen, controller, training_mode, without_setup=False)
 for k in range(10):
     obs = env.reset()
     for i in range(10):

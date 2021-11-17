@@ -48,22 +48,16 @@ action_list = [
 ]
 
 class UltimateEnv(gym.Env):
-    def __init__(self, game_path: str, dlc_dir: str, without_setup: bool = False):
+    def __init__(self, game_path: str, dlc_dir: str, screen, controller, mode, without_setup: bool = False):
         super().__init__()
         self.game_path = game_path
         self.dlc_dir = dlc_dir
         self.action_space = gym.spaces.Discrete(len(action_list)) 
-        self.screen = Screen()
+        self.screen = screen
         self.screen.run()
         time.sleep(1) # waiting run screen thread
-        self.controller = Controller()
-        self.training_mode = TrainingMode(
-            controller=self.controller,
-            stage=Stage.STAGE_FINAL_DESTINATION, 
-            player=Fighter.FIGHTER_MARIO,
-            cpu=Fighter.FIGHTER_DONKEY_KONG,
-            cpu_level=7,
-        )
+        self.controller = controller
+        self.mode = mode
         if not without_setup:
             self._setup()
         self.prev_observation, self.prev_info = self.reset()
@@ -72,13 +66,13 @@ class UltimateEnv(gym.Env):
         runner = Runner(self.game_path, self.dlc_dir)
         runner.run()
         self.controller.move_to_home()
-        self.training_mode.start()
+        self.mode.start()
         print("Training Mode")
         time.sleep(1)
 
     def reset(self):
         # click reset button
-        self.training_mode.reset()
+        self.mode.reset()
         return self._observe()
 
     def step(self, action: Action):
