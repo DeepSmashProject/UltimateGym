@@ -54,7 +54,7 @@ class UltimateEnv(gym.Env):
         self.dlc_dir = dlc_dir
         self.action_space = gym.spaces.Discrete(len(action_list)) 
         self.controller, self.screen, self.training_mode = self._setup()
-        self.prev_observation, self.prev_info = self._reset()
+        self.prev_observation, self.prev_info = self.reset()
 
     def _setup(self):
         screen = Screen()
@@ -75,12 +75,12 @@ class UltimateEnv(gym.Env):
         time.sleep(1)
         return controller, screen, training_mode
 
-    def _reset(self):
+    def reset(self):
         # click reset button
         self.training_mode.reset()
         return self._observe()
 
-    def _step(self, action: Action):
+    def step(self, action: Action):
         self.controller.act(action)
         observation, info = self._observe()
         reward = self._get_reward(info, self.prev_info)
@@ -89,7 +89,7 @@ class UltimateEnv(gym.Env):
         self.prev_info = info
         return observation, reward, self.done, info
 
-    def _render(self, mode='human', close=False):
+    def render(self, mode='human', close=False):
         print("You can see screen at http://localhost:8081/vnc.html")
         if mode == 'human':
             cv2.imshow('test', self.prev_observation)
