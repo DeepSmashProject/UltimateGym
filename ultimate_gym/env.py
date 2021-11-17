@@ -55,6 +55,7 @@ class UltimateEnv(gym.Env):
         self.action_space = gym.spaces.Discrete(len(action_list)) 
         self.screen = Screen()
         self.screen.run()
+        time.sleep(1) # waiting run screen thread
         self.controller = Controller()
         self.training_mode = TrainingMode(
             controller=self.controller,
