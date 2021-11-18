@@ -122,5 +122,15 @@ def _rgb_to_damage(rgb):
         damage = (idx + 1*rate) * 10 
     return damage
 
+def damage_buffer():
+    from collections import deque
+    d = deque([], 3)
+    d.append(0)
+    d.append(1)
+    d.append(1)
+    d.append(3)
+    print(d.count(1)+d.count(0) >= int(len(d)/2)+1)
+
 #resize()
-mode()
+#mode()
+damage_buffer()

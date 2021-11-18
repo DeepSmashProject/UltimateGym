@@ -6,6 +6,7 @@ import gym
 import numpy as np
 import cv2
 import time
+from collections import deque
 
 action_list = [
     Action.ACTION_JAB,
@@ -53,6 +54,8 @@ class UltimateEnv(gym.Env):
         self.game_path = game_path
         self.dlc_dir = dlc_dir
         self.action_space = gym.spaces.Discrete(len(action_list)) 
+        self.p1_d_buffer = deque([], 5)
+        self.p2_d_buffer = deque([], 5)
         self.screen = screen
         self.screen.run()
         time.sleep(1) # waiting run screen thread
@@ -73,6 +76,7 @@ class UltimateEnv(gym.Env):
     def reset(self):
         # click reset button
         self.mode.reset()
+        time.sleep(0.1) # waiting for setup
         return self._observe()
 
     def step(self, action: Action):
@@ -97,11 +101,10 @@ class UltimateEnv(gym.Env):
     def _observe(self):
         frame, fps = self.screen.get()
         # resolution = 512x512 grayscale, 
-        observation = np.squeeze(frame, 3)
-        print("obs shape", observation.shape)
+        observation = frame[:, :, :3]
         # remove background color
         damage = self._get_damage(observation)
-        kill = self._get_kill(observation)
+        kill = self._get_kill(damage)
         # get damege
         return observation, {"damage": damage, "kill": kill}
 
@@ -151,14 +154,20 @@ class UltimateEnv(gym.Env):
         img = cv2.bitwise_and(img, img, mask=img_mask)
         #cv2.imwrite("damage_remove_black.png", img)
         u, counts = np.unique(img[:, :, 0], return_counts=True)
-        b = u[np.argmax(counts[1:])]
+        b = u[np.argmax(counts[1:])] if len(counts) > 1 else u[np.argmax(counts)]
         u, counts = np.unique(img[:, :, 1], return_counts=True)
-        g = u[np.argmax(counts[1:])]
+        g = u[np.argmax(counts[1:])] if len(counts) > 1 else u[np.argmax(counts)]
         u, counts = np.unique(img[:, :, 2], return_counts=True)
-        r = u[np.argmax(counts[1:])]
+        r = u[np.argmax(counts[1:])] if len(counts) > 1 else u[np.argmax(counts)]
         return (r, g, b)
 
-    def _get_kill(self, observation):
-        # read damage from observation
-        kill = []
+    def _get_kill(self, damage):
+        (p1_damage, p2_damage) = damage
+        self.p1_d_buffer.append(p1_damage)
+        self.p2_d_buffer.append(p2_damage)
+        # exist 150 and 0 in 5 queue and majority
+        p1_kill = self.p1_d_buffer.count(150)+self.p1_d_buffer.count(0) >= int(len(self.p1_d_buffer)/2)+1
+        p2_kill = self.p2_d_buffer.count(150)+self.p2_d_buffer.count(0) >= int(len(self.p2_d_buffer)/2)+1
+        kill = (p1_kill, p2_kill)
+
         return kill
