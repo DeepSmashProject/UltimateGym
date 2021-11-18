@@ -8,7 +8,7 @@ import cv2
 import time
 from collections import deque
 import torch
-from data.model import Net
+from .model import Net
 # window start 211 138 853 487
 # window + screen -> screen only -> 
 # player1 damage 1 point (382,552,24,30) -> (171, 414, 24, 30)
@@ -148,7 +148,7 @@ class UltimateEnv(gym.Env):
         # read damage from observation
         # almost black to black (0,0,0)
         p1_damage_obs = (observation[419:439, 132:146], observation[419:439, 154:168], observation[419:439, 176:190]) #[y,x]
-        p2_damage_obs = (observation[419:439, 314:328], observation[419:439, 336:150], observation[419:439, 358:372]) #[y,x] #[y,x]
+        p2_damage_obs = (observation[419:439, 314:328], observation[419:439, 336:350], observation[419:439, 358:372]) #[y,x] #[y,x]
         #p1_damage_rgb = self._get_damage_rgb(p1_damage_obs)
         #p2_damage_rgb = self._get_damage_rgb(p2_damage_obs)
         #p1_damage = self._rgb_to_damage(p1_damage_rgb)
@@ -197,8 +197,9 @@ class UltimateEnv(gym.Env):
         if len(self.p1_d_buffer) < self.buffer_size or len(self.p2_d_buffer) < self.buffer_size:
             return (False, False)
         # exist 150 and 0 in 5 queue and majority
-        p1_kill = self.p1_d_buffer.count(150)+self.p1_d_buffer.count(0) >= int(len(self.p1_d_buffer)/2)+1
-        p2_kill = self.p2_d_buffer.count(150)+self.p2_d_buffer.count(0) >= int(len(self.p2_d_buffer)/2)+1
+        killed = self.p1_d_buffer.count(999)  >= int(len(self.p1_d_buffer)/2)+1 and self.p2_d_buffer.count(999) >= int(len(self.p2_d_buffer)/2)+1
+        p1_kill = killed and self.p1_d_buffer.count(999) > self.p2_d_buffer.count(999)
+        p2_kill = killed and self.p2_d_buffer.count(999) > self.p1_d_buffer.count(999)
         kill = (p1_kill, p2_kill)
 
         return kill
