@@ -54,8 +54,9 @@ class UltimateEnv(gym.Env):
         self.game_path = game_path
         self.dlc_dir = dlc_dir
         self.action_space = gym.spaces.Discrete(len(action_list)) 
-        self.p1_d_buffer = deque([], 5)
-        self.p2_d_buffer = deque([], 5)
+        self.buffer_size = 5
+        self.p1_d_buffer = deque([], self.buffer_size)
+        self.p2_d_buffer = deque([], self.buffer_size)
         self.screen = screen
         self.screen.run()
         time.sleep(1) # waiting run screen thread
@@ -75,6 +76,8 @@ class UltimateEnv(gym.Env):
 
     def reset(self):
         # click reset button
+        self.p1_d_buffer.clear()
+        self.p2_d_buffer.clear()
         self.mode.reset()
         time.sleep(0.1) # waiting for setup
         return self._observe()
@@ -166,6 +169,8 @@ class UltimateEnv(gym.Env):
         (p1_damage, p2_damage) = damage
         self.p1_d_buffer.append(p1_damage)
         self.p2_d_buffer.append(p2_damage)
+        if len(self.p1_d_buffer) < self.buffer_size or len(self.p2_d_buffer) < self.buffer_size:
+            return (False, False)
         # exist 150 and 0 in 5 queue and majority
         p1_kill = self.p1_d_buffer.count(150)+self.p1_d_buffer.count(0) >= int(len(self.p1_d_buffer)/2)+1
         p2_kill = self.p2_d_buffer.count(150)+self.p2_d_buffer.count(0) >= int(len(self.p2_d_buffer)/2)+1
