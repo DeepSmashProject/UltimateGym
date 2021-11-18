@@ -147,8 +147,8 @@ class UltimateEnv(gym.Env):
     def _get_damage(self, observation):
         # read damage from observation
         # almost black to black (0,0,0)
-        p1_damage_obs = (observation[419:439, 132:146], observation[419:439, 154:168], observation[419:439, 176:190]) #[y,x]
-        p2_damage_obs = (observation[419:439, 314:328], observation[419:439, 336:350], observation[419:439, 358:372]) #[y,x] #[y,x]
+        p1_damage_obs = (observation[414:444, 127:151], observation[414:444, 149:173], observation[414:444, 171:195]) #[y,x]
+        p2_damage_obs = (observation[414:444, 309:333], observation[414:444, 331:355], observation[414:444, 353:377]) #[y,x] 
         #p1_damage_rgb = self._get_damage_rgb(p1_damage_obs)
         #p2_damage_rgb = self._get_damage_rgb(p2_damage_obs)
         #p1_damage = self._rgb_to_damage(p1_damage_rgb)
