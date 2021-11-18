@@ -83,7 +83,7 @@ class UltimateEnv(gym.Env):
         self.controller.act(action)
         observation, info = self._observe()
         reward = self._reward(info, self.prev_info)
-        self.done = self._done(info, self.prev_info)
+        self.done = self._done(info)
         self.prev_observation = observation
         self.prev_info = info
         return observation, reward, self.done, info
@@ -108,9 +108,10 @@ class UltimateEnv(gym.Env):
         # get damege
         return observation, {"damage": damage, "kill": kill}
 
-    def _done(self, observation, prev_observation):
-        # if 
+    def _done(self, info):
         done = False
+        if info["kill"][0] or info["kill"][1]:
+            done = True
         return done
 
     def _reward(self, observation, prev_observation):

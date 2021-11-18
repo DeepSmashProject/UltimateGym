@@ -67,10 +67,11 @@ training_mode = TrainingMode(
 
 env = UltimateEnv(args.game, args.dlc, screen, controller, training_mode, without_setup=False)
 for k in range(10):
+    done = False
     obs = env.reset()
-    for i in range(10):
+    while not done:
         action = random.choice(action_list)
         next_obs, reward, done, info = env.step(action)
-        print("episode: {}, step: {}, obs: {}, damage: {}, kill: {}".format(k, i, next_obs[100][100], info["damage"], info["kill"]))
+        print("episode: {}, step: {}, obs: {}, done: {}, damage: {}, kill: {}".format(k, i, next_obs[100][100], done, info["damage"], info["kill"]))
 env.close()
 print("finished!")
