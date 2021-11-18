@@ -37,7 +37,7 @@ class Net(nn.Module):
         self.eval()
         for data in damage_obs:
             data = cv2.resize(data, (32, 32))
-            data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+            #data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
             data = self.extract_black(data)
             X = [data]
             X = torch.tensor(X) / 255
@@ -50,9 +50,9 @@ class Net(nn.Module):
         return damage
 
     def extract_black(self, img):
-        lower = np.array([0]) 
-        upper = np.array([10])
+        lower = np.array([0, 0, 0]) 
+        upper = np.array([30, 30, 30])
         img = cv2.inRange(img, lower, upper)
         #img_mask = cv2.bitwise_not(img_mask,img_mask)
-        #img = cv2.bitwise_and(img, img, mask=img_mask)
+        #img = cv2.bitwise_not(img, img, mask=img_mask)
         return img
