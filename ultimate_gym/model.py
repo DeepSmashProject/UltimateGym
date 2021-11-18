@@ -65,7 +65,7 @@ class NetV3(nn.Module):
         self.conv2 = nn.Conv2d(32, 64, 3, 1)
         self.dropout1 = nn.Dropout(0.25)
         self.dropout2 = nn.Dropout(0.5)
-        self.fc1 = nn.Linear(7200, 128)
+        self.fc1 = nn.Linear(12544, 128)
         self.fc2 = nn.Linear(128, 11)
         self.path = Path(os.path.dirname(__file__)).resolve()
         self.model_path = str(self.path)+"/mnist_cnn_v3.pt"
