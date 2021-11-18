@@ -127,10 +127,26 @@ def damage_buffer():
     d = deque([], 3)
     d.append(0)
     d.append(1)
-    d.append(1)
-    d.append(3)
+    print(len(d))
     print(d.count(1)+d.count(0) >= int(len(d)/2)+1)
+
+def ditect_num():
+    img = cv2.imread('one.png', cv2.IMREAD_COLOR)
+    # almost black to black (0,0,0)
+    lower = np.array([0,0,0]) 
+    upper = np.array([250,200,250])
+    img_mask = cv2.inRange(img, lower, upper)
+    img_mask = cv2.bitwise_not(img_mask,img_mask)
+    img = cv2.bitwise_and(img, img, mask=img_mask)
+    cv2.imwrite("one_test.png", img)
+    
+def recreate_png():
+    filename = 'outfile.png'
+    img = cv2.imread(filename, cv2.IMREAD_COLOR)
+    cv2.imwrite("{}_created.png".format(filename), img)
 
 #resize()
 #mode()
-damage_buffer()
+#damage_buffer()
+#ditect_num()
+recreate_png()

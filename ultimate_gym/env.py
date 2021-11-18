@@ -7,6 +7,24 @@ import numpy as np
 import cv2
 import time
 from collections import deque
+import torch
+from data.model import Net
+# window start 211 138 853 487
+# window + screen -> screen only -> 
+# player1 damage 1 point (382,552,24,30) -> (171, 414, 24, 30)
+# player1 damage 10 point (360,552,24,30) -> (149, 414, 24, 30)
+# player1 damage 100 point (338,552,24,30) -> (127, 414, 24, 30)
+# player1 damage point (564,552,24,30) -> (353, 414, 24, 30)
+# player1 damage point (542,552,24,30) -> (331, 414, 24, 30)
+# player1 damage point (520,552,24,30) -> (309, 414, 24, 30)
+# -10 width -10 height
+# player1 damage 1 point (387,557,14,20) -> (176, 419, 14, 20)
+# player1 damage 10 point (365,557,14,20) -> (154, 419, 14, 20)
+# player1 damage 100 point (343,557,14,20) -> (132, 419, 14, 20)
+# player1 damage point (569,557,14,20) -> (358, 419, 14, 20)
+# player1 damage point (547,557,14,20) -> (336, 419, 14, 20)
+# player1 damage point (525,557,14,20) -> (314, 419, 14, 20)
+
 
 action_list = [
     Action.ACTION_JAB,
@@ -54,6 +72,11 @@ class UltimateEnv(gym.Env):
         self.game_path = game_path
         self.dlc_dir = dlc_dir
         self.action_space = gym.spaces.Discrete(len(action_list)) 
+
+        # damage predict model
+        device = torch.device("cpu")
+        self.model = Net().to(device)
+
         self.buffer_size = 5
         self.p1_d_buffer = deque([], self.buffer_size)
         self.p2_d_buffer = deque([], self.buffer_size)
@@ -124,12 +147,14 @@ class UltimateEnv(gym.Env):
     def _get_damage(self, observation):
         # read damage from observation
         # almost black to black (0,0,0)
-        p1_damage_obs = observation[418:440, 178:191] #[y,x]
-        p2_damage_obs = observation[418:440, 358:373] #[y,x]
-        p1_damage_rgb = self._get_damage_rgb(p1_damage_obs)
-        p2_damage_rgb = self._get_damage_rgb(p2_damage_obs)
-        p1_damage = self._rgb_to_damage(p1_damage_rgb)
-        p2_damage = self._rgb_to_damage(p2_damage_rgb)
+        p1_damage_obs = (observation[419:439, 132:146], observation[419:439, 154:168], observation[419:439, 176:190]) #[y,x]
+        p2_damage_obs = (observation[419:439, 314:328], observation[419:439, 336:150], observation[419:439, 358:372]) #[y,x] #[y,x]
+        #p1_damage_rgb = self._get_damage_rgb(p1_damage_obs)
+        #p2_damage_rgb = self._get_damage_rgb(p2_damage_obs)
+        #p1_damage = self._rgb_to_damage(p1_damage_rgb)
+        #p2_damage = self._rgb_to_damage(p2_damage_rgb)
+        p1_damage = self.model.predict_damage(p1_damage_obs)
+        p2_damage = self.model.predict_damage(p2_damage_obs)
         return (p1_damage, p2_damage)
 
     def _rgb_to_damage(self, rgb):
