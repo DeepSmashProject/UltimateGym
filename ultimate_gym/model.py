@@ -68,7 +68,7 @@ class NetV3(nn.Module):
         self.fc1 = nn.Linear(7200, 128)
         self.fc2 = nn.Linear(128, 11)
         self.path = Path(os.path.dirname(__file__)).resolve()
-        self.model_path = str(self.path)+"/mnist_cnn_v2.pt"
+        self.model_path = str(self.path)+"/mnist_cnn_v3.pt"
         self.load()
 
     def forward(self, x):
