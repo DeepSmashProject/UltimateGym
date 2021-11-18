@@ -69,9 +69,11 @@ env = UltimateEnv(args.game, args.dlc, screen, controller, training_mode, withou
 for k in range(10):
     done = False
     obs = env.reset()
+    step = 0
     while not done:
         action = random.choice(action_list)
         next_obs, reward, done, info = env.step(action)
-        print("episode: {}, step: {}, obs: {}, done: {}, damage: {}, kill: {}".format(k, i, next_obs[100][100], done, info["damage"], info["kill"]))
+        print("episode: {}, step: {}, obs: {}, done: {}, damage: {}, kill: {}".format(k, step, next_obs[100][100], done, info["damage"], info["kill"]))
+        step += 1
 env.close()
 print("finished!")
