@@ -14,16 +14,16 @@ from .model import Net, NetV3
 # player1 damage 1 point (382,552,24,30) -> (171, 414, 24, 30)
 # player1 damage 10 point (360,552,24,30) -> (149, 414, 24, 30)
 # player1 damage 100 point (338,552,24,30) -> (127, 414, 24, 30)
-# player1 damage point (564,552,24,30) -> (353, 414, 24, 30)
-# player1 damage point (542,552,24,30) -> (331, 414, 24, 30)
-# player1 damage point (520,552,24,30) -> (309, 414, 24, 30)
+# player2 damage point (564,552,24,30) -> (353, 414, 24, 30)
+# player2 damage point (542,552,24,30) -> (331, 414, 24, 30)
+# player2 damage point (520,552,24,30) -> (309, 414, 24, 30)
 # -10 width -10 height
 # player1 damage 1 point (387,557,14,20) -> (176, 419, 14, 20)
 # player1 damage 10 point (365,557,14,20) -> (154, 419, 14, 20)
 # player1 damage 100 point (343,557,14,20) -> (132, 419, 14, 20)
-# player1 damage point (569,557,14,20) -> (358, 419, 14, 20)
-# player1 damage point (547,557,14,20) -> (336, 419, 14, 20)
-# player1 damage point (525,557,14,20) -> (314, 419, 14, 20)
+# player2 damage point (569,557,14,20) -> (358, 419, 14, 20)
+# player2 damage point (547,557,14,20) -> (336, 419, 14, 20)
+# player2 damage point (525,557,14,20) -> (314, 419, 14, 20)
 
 
 action_list = [

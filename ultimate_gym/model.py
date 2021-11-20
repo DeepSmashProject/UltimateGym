@@ -114,3 +114,63 @@ class NetV3(nn.Module):
         #img_mask = cv2.bitwise_not(img_mask,img_mask)
         #img = cv2.bitwise_not(img, img, mask=img_mask)
         return img
+
+class NetV4(nn.Module):
+    def __init__(self):
+        super(NetV4, self).__init__()
+        self.conv1 = nn.Conv2d(1, 32, 3, 1)
+        self.conv2 = nn.Conv2d(32, 64, 3, 1)
+        self.dropout1 = nn.Dropout(0.25)
+        self.dropout2 = nn.Dropout(0.5)
+        self.fc1 = nn.Linear(12544, 128)
+        self.fc2 = nn.Linear(128, 11)
+        self.path = Path(os.path.dirname(__file__)).resolve()
+        self.model_path = str(self.path)+"/mnist/mnist_cnn_v4.pt"
+        #self.p1_damage_obs = ((127, 414, 24, 30), (149, 414, 24, 30), (171, 414, 24, 30))
+        #self.p2_damage_obs = ((309, 414, 24, 30), (331, 414, 24, 30), (353, 414, 24, 30))
+        self.load()
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = F.relu(x)
+        x = self.conv2(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, 2)
+        x = self.dropout1(x)
+        x = torch.flatten(x, 1)
+        x = self.fc1(x)
+        x = F.relu(x)
+        x = self.dropout2(x)
+        x = self.fc2(x)
+        output = F.log_softmax(x, dim=1)
+        return output
+
+    
+    def load(self):
+        self.load_state_dict(torch.load(self.model_path))
+
+    def predict_damage(self, damage_obs_list):
+        damage = ""
+        self.eval()
+        for damage_obs in damage_obs_list:
+            processed_obs = self.precess_obs(damage_obs)
+            output = self(processed_obs) # output is 0~10
+            pred = output.argmax(dim=1, keepdim=True)[0][0].item()
+            if pred != 10: # 10 is no number
+                damage += str(pred)
+        damage = int(damage) if len(damage) > 0 else 999
+        return damage
+
+    def process_obs(self, obs):
+        obs = cv2.resize(obs, (32, 32))
+        obs = self.extract_black(obs)
+        obs = [obs]
+        obs = torch.tensor(obs) / 255
+        obs = obs.unsqueeze(1)
+        return obs
+
+    def extract_black(self, img):
+        lower = np.array([0, 0, 0]) 
+        upper = np.array([50, 50, 50])
+        img = cv2.inRange(img, lower, upper)
+        return img
