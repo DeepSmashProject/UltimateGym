@@ -1,4 +1,4 @@
-from yuzulib import Screen as YuzuScreen
+from libultimate import Screen as YuzuScreen
 from threading import (Event)
 
 class Screen(YuzuScreen):

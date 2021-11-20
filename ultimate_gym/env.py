@@ -1,6 +1,5 @@
 
-from libultimate import Controller, Action, Fighter, Stage, TrainingMode
-from yuzulib import Runner
+from libultimate import Controller, Action, Fighter, Stage, TrainingMode, Runner
 from .screen import Screen
 import gym
 import numpy as np
