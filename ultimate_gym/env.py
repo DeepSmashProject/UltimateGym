@@ -7,7 +7,7 @@ import cv2
 import time
 from collections import deque
 import torch
-from .model import Net, NetV3
+from .model import Net, NetV3, NetV5
 # window start 211 138 853 487
 # window + screen -> screen only -> 
 # player1 damage 1 point (382,552,24,30) -> (171, 414, 24, 30)
@@ -74,7 +74,8 @@ class UltimateEnv(gym.Env):
 
         # damage predict model
         device = torch.device("cpu")
-        self.model = NetV3().to(device)
+        self.model = NetV5().to(device)
+        self.model.load()
 
         self.buffer_size = 5
         self.p1_d_buffer = deque([], self.buffer_size)

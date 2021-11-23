@@ -214,16 +214,16 @@ def main():
     print("eval size", u, counts)
 
     #scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
-    for epoch in range(1, 20):
+    #for epoch in range(1, 20):
         #train(args, model, device, train_loader, optimizer, epoch)
         #test(model, device, test_loader)
-        train(model, device, train_X, train_y, optimizer, epoch)
-        test(model, device, test_X, test_y)
+    #    train(model, device, train_X, train_y, optimizer, epoch)
+    #    test(model, device, test_X, test_y)
         #scheduler.step()
 
     # eval
     print("Evaluation")
-    #model.load_state_dict(torch.load("./mnist_cnn_v4.pt"))
+    model.load_state_dict(torch.load("./mnist_cnn_v4.pt"))
     test(model, device, eval_X, eval_y)
 
     if args.save_model:
