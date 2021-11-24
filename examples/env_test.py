@@ -73,7 +73,7 @@ for k in range(10):
     while not done:
         action = random.choice(action_list)
         next_obs, reward, done, info = env.step(action)
-        print("episode: {}, step: {}, obs: {}, done: {}, damage: {}, kill: {}".format(k, step, next_obs[100][100], done, info["damage"], info["kill"]))
+        print("episode: {}, step: {}, obs: {}, done: {}, damage: {}, diff_damage: {}, kill: {}".format(k, step, next_obs[100][100], done, info["damage"], info["diff_damage"], info["kill"]))
         step += 1
 env.close()
 print("finished!")

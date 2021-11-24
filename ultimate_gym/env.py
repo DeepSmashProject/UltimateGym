@@ -77,9 +77,13 @@ class UltimateEnv(gym.Env):
         self.model = NetV5().to(device)
         self.model.load()
 
-        self.buffer_size = 5
+        self.buffer_size = 2
         self.p1_d_buffer = deque([], self.buffer_size)
         self.p2_d_buffer = deque([], self.buffer_size)
+        self.p1_damage = 0
+        self.p2_damage = 0
+        self.p1_damaged_or_killed_flag = False
+        self.p2_damaged_or_killed_flag = False
         self.screen = screen
         self.screen.run()
         time.sleep(1) # waiting run screen thread
@@ -101,6 +105,10 @@ class UltimateEnv(gym.Env):
         # click reset button
         self.p1_d_buffer.clear()
         self.p2_d_buffer.clear()
+        self.p1_damage = 0
+        self.p2_damage = 0
+        self.p1_damaged_or_killed_flag = False
+        self.p2_damaged_or_killed_flag = False
         self.mode.reset()
         time.sleep(1) # waiting for setup
         return self._observe()
@@ -108,7 +116,7 @@ class UltimateEnv(gym.Env):
     def step(self, action: Action):
         self.controller.act(action)
         observation, info = self._observe()
-        reward = self._reward(info, self.prev_info)
+        reward = self._reward(info)
         self.done = self._done(info)
         self.prev_observation = observation
         self.prev_info = info
@@ -129,10 +137,10 @@ class UltimateEnv(gym.Env):
         # resolution = 512x512 grayscale, 
         observation = frame[:, :, :3]
         # remove background color
-        damage = self._get_damage(observation)
-        kill = self._get_kill(damage)
+        damage, diff_damage, kill = self._get_damage(observation)
+        #kill = self._get_kill(damage)
         # get damege
-        return observation, {"damage": damage, "kill": kill}
+        return observation, {"damage": damage, "diff_damage": diff_damage, "kill": kill}
 
     def _done(self, info):
         done = False
@@ -140,7 +148,7 @@ class UltimateEnv(gym.Env):
             done = True
         return done
 
-    def _reward(self, observation, prev_observation):
+    def _reward(self, info):
         reward = 0
         return reward
 
@@ -152,16 +160,47 @@ class UltimateEnv(gym.Env):
         p2_damage_obs = (observation[411:441, 306:330], observation[411:441, 328:352], observation[411:441, 350:374]) #[y,x] 
         p1_damage = self.model.predict_damage(p1_damage_obs)
         p2_damage = self.model.predict_damage(p2_damage_obs)
-        return (p1_damage, p2_damage)
+        self.p1_d_buffer.append(p1_damage)
+        self.p2_d_buffer.append(p2_damage)
+        p1_diff_damage = 0
+        p2_diff_damage = 0
+        p1_killed = False
+        p2_killed = False
+        if self.p1_d_buffer.count(self.p1_damage) == 0 and self.p1_d_buffer.count(999) == 0 and p1_damage != self.p1_damage:
+            p1_diff_damage = p1_damage - self.p1_damage
+            if p1_diff_damage > 0:
+                self.p1_damage = p1_damage
+            else:
+                p1_diff_damage = 0
+            # kill or not
+            if self.p1_damaged_or_killed_flag and p1_damage == 0:
+                p1_killed = True
+        if self.p2_d_buffer.count(self.p2_damage) == 0 and self.p2_d_buffer.count(999) == 0 and p2_damage != self.p2_damage:
+            p2_diff_damage = p2_damage - self.p2_damage
+            if p2_diff_damage > 0:
+                self.p2_damage = p2_damage
+            else:
+                p2_diff_damage = 0
+            # kill or not
+            if self.p2_damaged_or_killed_flag and p2_damage == 0:
+                p2_killed = True
+
+        # killed flag
+        if self.p1_d_buffer.count(999) >= len(self.p1_d_buffer):
+            self.p1_damaged_or_killed_flag = True
+        if self.p2_d_buffer.count(999) >= len(self.p2_d_buffer):
+            self.p2_damaged_or_killed_flag = True
+            
+        return (self.p1_damage, self.p2_damage), (p1_diff_damage, p2_diff_damage), (p1_killed, p2_killed)
 
     def _get_kill(self, damage):
         (p1_damage, p2_damage) = damage
-        self.p1_d_buffer.append(p1_damage)
-        self.p2_d_buffer.append(p2_damage)
+        #self.p1_d_buffer.append(p1_damage)
+        #self.p2_d_buffer.append(p2_damage)
         if len(self.p1_d_buffer) < self.buffer_size or len(self.p2_d_buffer) < self.buffer_size:
             return (False, False)
         # exist 150 and 0 in 5 queue and majority
-        killed = self.p1_d_buffer.count(999)  >= int(len(self.p1_d_buffer)/2)+1 and self.p2_d_buffer.count(999) >= int(len(self.p2_d_buffer)/2)+1
+        killed = self.p1_d_buffer.count(999)  >= len(self.p1_d_buffer) and self.p2_d_buffer.count(999) >= len(self.p2_d_buffer)
         p1_kill = killed and self.p1_d_buffer.count(999) > self.p2_d_buffer.count(999)
         p2_kill = killed and self.p2_d_buffer.count(999) > self.p1_d_buffer.count(999)
         kill = (p1_kill, p2_kill)
