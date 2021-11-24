@@ -102,7 +102,7 @@ class UltimateEnv(gym.Env):
         self.p1_d_buffer.clear()
         self.p2_d_buffer.clear()
         self.mode.reset()
-        time.sleep(0.1) # waiting for setup
+        time.sleep(1) # waiting for setup
         return self._observe()
 
     def step(self, action: Action):
@@ -146,8 +146,10 @@ class UltimateEnv(gym.Env):
 
     def _get_damage(self, observation):
         # read damage from observation
-        p1_damage_obs = (observation[414:444, 127:151], observation[414:444, 149:173], observation[414:444, 171:195]) #[y,x]
-        p2_damage_obs = (observation[414:444, 309:333], observation[414:444, 331:355], observation[414:444, 353:377]) #[y,x] 
+        #p1_damage_obs = (observation[414:444, 127:151], observation[414:444, 149:173], observation[414:444, 171:195]) #[y,x]
+        #p2_damage_obs = (observation[414:444, 309:333], observation[414:444, 331:355], observation[414:444, 353:377]) #[y,x] 
+        p1_damage_obs = (observation[411:441, 124:148], observation[411:441, 146:170], observation[411:441, 168:192]) #[y,x]
+        p2_damage_obs = (observation[411:441, 306:330], observation[411:441, 328:352], observation[411:441, 350:374]) #[y,x] 
         p1_damage = self.model.predict_damage(p1_damage_obs)
         p2_damage = self.model.predict_damage(p2_damage_obs)
         return (p1_damage, p2_damage)
