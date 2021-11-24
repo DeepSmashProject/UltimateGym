@@ -59,10 +59,10 @@ screen = Screen(fps=30)
 controller = Controller()
 training_mode = TrainingMode(
     controller=controller,
-    stage=Stage.STAGE_FINAL_DESTINATION, 
+    stage=Stage.STAGE_HANENBOW, 
     player=Fighter.FIGHTER_MARIO,
-    cpu=Fighter.FIGHTER_DONKEY_KONG,
-    cpu_level=7,
+    cpu=Fighter.FIGHTER_MARIO,
+    cpu_level=9,
 )
 
 env = UltimateEnv(args.game, args.dlc, screen, controller, training_mode, without_setup=False)
