@@ -146,49 +146,11 @@ class UltimateEnv(gym.Env):
 
     def _get_damage(self, observation):
         # read damage from observation
-        # almost black to black (0,0,0)
         p1_damage_obs = (observation[414:444, 127:151], observation[414:444, 149:173], observation[414:444, 171:195]) #[y,x]
         p2_damage_obs = (observation[414:444, 309:333], observation[414:444, 331:355], observation[414:444, 353:377]) #[y,x] 
-        #p1_damage_rgb = self._get_damage_rgb(p1_damage_obs)
-        #p2_damage_rgb = self._get_damage_rgb(p2_damage_obs)
-        #p1_damage = self._rgb_to_damage(p1_damage_rgb)
-        #p2_damage = self._rgb_to_damage(p2_damage_rgb)
         p1_damage = self.model.predict_damage(p1_damage_obs)
         p2_damage = self.model.predict_damage(p2_damage_obs)
         return (p1_damage, p2_damage)
-
-    def _rgb_to_damage(self, rgb):
-        print(rgb)
-        (r, g, b) = rgb
-        # damage color list 0~150%   // color=R+G
-        damage_color_list = [510, 500, 480, 455, 420, 390, 360, 330, 300, 290, 275, 265, 255, 248, 237, 227]
-        color = int(r) + int(g)
-        damage = 0
-        if color >= damage_color_list[0]: return 0
-        if color <= damage_color_list[len(damage_color_list)-1]: return 150
-        idx = np.abs(np.asarray(damage_color_list) - color).argmin()
-        if color >= damage_color_list[idx]:
-            rate = (color - damage_color_list[idx]) / (damage_color_list[idx-1] - damage_color_list[idx])
-            damage = (idx- 1*rate) * 10 
-        else:
-            rate = (color - damage_color_list[idx+1]) / (damage_color_list[idx] - damage_color_list[idx+1])
-            damage = (idx + 1*rate) * 10 
-        return damage
-
-    def _get_damage_rgb(self, img):
-        lower = np.array([0,0,0]) 
-        upper = np.array([100,100,100])
-        img_mask = cv2.inRange(img, lower, upper)
-        img_mask = cv2.bitwise_not(img_mask,img_mask)
-        img = cv2.bitwise_and(img, img, mask=img_mask)
-        #cv2.imwrite("damage_remove_black.png", img)
-        u, counts = np.unique(img[:, :, 0], return_counts=True)
-        b = u[np.argmax(counts[1:])] if len(counts) > 1 else u[np.argmax(counts)]
-        u, counts = np.unique(img[:, :, 1], return_counts=True)
-        g = u[np.argmax(counts[1:])] if len(counts) > 1 else u[np.argmax(counts)]
-        u, counts = np.unique(img[:, :, 2], return_counts=True)
-        r = u[np.argmax(counts[1:])] if len(counts) > 1 else u[np.argmax(counts)]
-        return (r, g, b)
 
     def _get_kill(self, damage):
         (p1_damage, p2_damage) = damage

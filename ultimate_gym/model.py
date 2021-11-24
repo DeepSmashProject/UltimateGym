@@ -210,7 +210,7 @@ class NetV5(nn.Module):
         #print("preprocess", obs.size())
         result_obs = []
         for img in obs:
-            img = img.numpy()
+            #img = img.numpy()
             #print(img.shape)
             img = cv2.resize(img, (32, 32))
             img = self._extract_black(img)
@@ -236,8 +236,10 @@ class NetV5(nn.Module):
     def predict_damage(self, damage_obs_list):
         damage = ""
         self.eval()
-        for damage_obs in damage_obs_list:
-            pred = self.predict(damage_obs)
+        for i, damage_obs in enumerate(damage_obs_list):
+            pred = self.predict([damage_obs])
+            if i == 0 and pred >= 3:
+                pred = 10 # no more than > 300 %
             if pred != 10: # 10 is no number
                 damage += str(pred)
         damage = int(damage) if len(damage) > 0 else 999
