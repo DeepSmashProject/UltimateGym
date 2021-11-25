@@ -91,7 +91,7 @@ class UltimateEnv(gym.Env):
         self.mode = mode
         if not without_setup:
             self._setup()
-        self.prev_observation, self.prev_info = self.reset()
+        self.prev_observation = self.reset()
 
     def _setup(self):
         runner = Runner(self.game_path, self.dlc_dir)
@@ -110,8 +110,9 @@ class UltimateEnv(gym.Env):
         self.p1_damaged_or_killed_flag = False
         self.p2_damaged_or_killed_flag = False
         self.mode.reset()
-        time.sleep(1) # waiting for setup
-        return self._observe()
+        time.sleep(0.5) # waiting for setup
+        observation, info = self._observe()
+        return observation
 
     def step(self, action: Action):
         self.controller.act(action)

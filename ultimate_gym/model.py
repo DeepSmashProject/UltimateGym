@@ -216,6 +216,7 @@ class NetV5(nn.Module):
             img = self._extract_black(img)
             result_obs.append(img)
         
+        result_obs = np.array(result_obs, dtype=np.double)
         result_obs = torch.tensor(result_obs) / 255
         result_obs = result_obs.unsqueeze(1)
         #print("test", result_obs.size())
