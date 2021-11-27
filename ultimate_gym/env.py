@@ -101,15 +101,16 @@ class UltimateEnv(gym.Env):
         print("Training Mode")
         time.sleep(1)
 
-    def reset(self):
+    def reset(self, without_reset=False):
         # click reset button
         self.p1_d_buffer.clear()
         self.p2_d_buffer.clear()
-        self.p1_damage = 0
-        self.p2_damage = 0
         self.p1_damaged_or_killed_flag = False
         self.p2_damaged_or_killed_flag = False
-        self.mode.reset()
+        if not without_reset:
+            self.p1_damage = 0
+            self.p2_damage = 0
+            self.mode.reset()
         time.sleep(0.5) # waiting for setup
         observation, info = self._observe()
         return observation
