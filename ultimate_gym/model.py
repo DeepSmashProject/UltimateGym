@@ -229,7 +229,7 @@ class NetV5(nn.Module):
     def predict(self, obs):
         # obs: (B, W, H, C) -> (B, 32, 32, 3)
         obs = self._preprocess(obs)
-        output = self(obs) # output is 0~10
+        output = self(obs.float()) # output is 0~10
         #print("debug2", obs.size(), output.size())
         pred = output.argmax(dim=1, keepdim=True)[0][0].item()
         return pred
