@@ -140,7 +140,6 @@ class UltimateEnv(gym.Env):
         observation = frame[:, :, :3]
         # remove background color
         damage, diff_damage, kill = self._get_damage(observation)
-        #kill = self._get_kill(damage)
         # get damege
         return observation, {"damage": damage, "diff_damage": diff_damage, "kill": kill}
 
@@ -182,6 +181,7 @@ class UltimateEnv(gym.Env):
             # kill or not
             if self.p1_damaged_or_killed_flag and p1_damage == 0:
                 p1_killed = True
+                self.p1_damage = 0
         if self.p2_d_buffer.count(self.p2_damage) == 0 and self.p2_d_buffer.count(999) == 0 and p2_damage != self.p2_damage:
             p2_diff_damage = p2_damage - self.p2_damage
             if p2_diff_damage > 0:
@@ -191,6 +191,7 @@ class UltimateEnv(gym.Env):
             # kill or not
             if self.p2_damaged_or_killed_flag and p2_damage == 0:
                 p2_killed = True
+                self.p2_damage = 0
 
         # killed flag
         if self.p1_d_buffer.count(999) >= len(self.p1_d_buffer):
@@ -199,17 +200,3 @@ class UltimateEnv(gym.Env):
             self.p2_damaged_or_killed_flag = True
             
         return (self.p1_damage, self.p2_damage), (p1_diff_damage, p2_diff_damage), (p1_killed, p2_killed)
-
-    def _get_kill(self, damage):
-        (p1_damage, p2_damage) = damage
-        #self.p1_d_buffer.append(p1_damage)
-        #self.p2_d_buffer.append(p2_damage)
-        if len(self.p1_d_buffer) < self.buffer_size or len(self.p2_d_buffer) < self.buffer_size:
-            return (False, False)
-        # exist 150 and 0 in 5 queue and majority
-        killed = self.p1_d_buffer.count(999)  >= len(self.p1_d_buffer) and self.p2_d_buffer.count(999) >= len(self.p2_d_buffer)
-        p1_kill = killed and self.p1_d_buffer.count(999) > self.p2_d_buffer.count(999)
-        p2_kill = killed and self.p2_d_buffer.count(999) > self.p1_d_buffer.count(999)
-        kill = (p1_kill, p2_kill)
-
-        return kill
