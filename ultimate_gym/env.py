@@ -152,10 +152,10 @@ class UltimateEnv(gym.Env):
     def _reward(self, info):
         p1_diff_damage = info["diff_damage"][0]
         p2_diff_damage = info["diff_damage"][1]
-        reward = (p2_diff_damage - p1_diff_damage) / 20
+        reward = p2_diff_damage - p1_diff_damage
 
-        reward = -1 if info["kill"][0] == True else reward
-        reward = 1 if info["kill"][1] == True else reward
+        #reward = -1 if info["kill"][0] == True else reward
+        #reward = 1 if info["kill"][1] == True else reward
         return reward
 
     def _get_damage(self, observation):
