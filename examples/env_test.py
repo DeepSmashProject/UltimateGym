@@ -1,19 +1,10 @@
 
-from ultimate_gym import Screen, UltimateEnv
-from libultimate import Controller, Action, Fighter, Stage, TrainingMode
+from ultimate_gym import Screen, UltimateEnv, Controller
+from libultimate import Action
 import time
 import random
 import argparse
 import os
-
-parser = argparse.ArgumentParser()
-parser.add_argument('-g', '--game', help="game path: ex. /path/to/game[v0].nsp")
-parser.add_argument('-d', '--dlc', help="dlc dir: ex. /path/to/dlc/")
-args = parser.parse_args()
-
-if args.game == "" or args.dlc == "":
-    print("Invalid argument")
-    os.exit(1)
 
 action_list = [
     Action.ACTION_JAB,
@@ -55,17 +46,10 @@ action_list = [
     Action.ACTION_NO_OPERATION
 ]
 
-screen = Screen(fps=30)
-controller = Controller()
-training_mode = TrainingMode(
-    controller=controller,
-    stage=Stage.STAGE_HANENBOW, 
-    player=Fighter.FIGHTER_MARIO,
-    cpu=Fighter.FIGHTER_MARIO,
-    cpu_level=9,
-)
+screen = Screen(fps=30, addres="http://localhost:6000")
+controller = Controller(addres="http://localhost:6000")
 
-env = UltimateEnv(args.game, args.dlc, screen, controller, training_mode, without_setup=False)
+env = UltimateEnv(screen, controller)
 for k in range(10):
     done = False
     obs = env.reset()
@@ -73,7 +57,13 @@ for k in range(10):
     while not done:
         action = random.choice(action_list)
         next_obs, reward, done, info = env.step(action)
-        print("episode: {}, step: {}, obs: {}, done: {}, reward: {}, damage: {}, diff_damage: {}, kill: {}".format(k, step, next_obs[100][100], done, reward, info["damage"], info["diff_damage"], info["kill"]))
+        print("episode: {}, step: {}, action: {}, obs: {}, done: {}, reward: {}, damage: {}, diff_damage: {}, kill: {}".format(k, step, action["name"], next_obs[100][100], done, reward, info["damage"], info["diff_damage"], info["kill"]))
         step += 1
-env.close()
 print("finished!")
+
+
+'''ACTION_RIGHT_ROLL
+ACTION_SPOT_DODGE
+ACTION_NO_OPERATION
+ACTION_LEFT_TILT
+ACTION_JUMP'''

@@ -1,6 +1,7 @@
 
-from libultimate import Controller, Action, Fighter, Stage, TrainingMode, Runner
+from libultimate import Action
 from .screen import Screen
+from .controller import Controller
 import gym
 import numpy as np
 import cv2
@@ -66,10 +67,8 @@ action_list = [
 ]
 
 class UltimateEnv(gym.Env):
-    def __init__(self, game_path: str, dlc_dir: str, screen, controller, mode, without_setup: bool = False):
+    def __init__(self, screen: Screen, controller: Controller):
         super().__init__()
-        self.game_path = game_path
-        self.dlc_dir = dlc_dir
         self.action_space = gym.spaces.Discrete(len(action_list)) 
 
         # damage predict model
@@ -88,18 +87,7 @@ class UltimateEnv(gym.Env):
         self.screen.run()
         time.sleep(1) # waiting run screen thread
         self.controller = controller
-        self.mode = mode
-        if not without_setup:
-            self._setup()
         self.prev_observation = self.reset()
-
-    def _setup(self):
-        runner = Runner(self.game_path, self.dlc_dir)
-        runner.run()
-        self.controller.move_to_home()
-        self.mode.start()
-        print("Training Mode")
-        time.sleep(1)
 
     def reset(self, without_reset=False):
         # click reset button
@@ -110,7 +98,7 @@ class UltimateEnv(gym.Env):
         if not without_reset:
             self.p1_damage = 0
             self.p2_damage = 0
-            self.mode.reset()
+            self.controller.reset_training()
         time.sleep(0.5) # waiting for setup
         observation, info = self._observe()
         return observation
@@ -125,21 +113,21 @@ class UltimateEnv(gym.Env):
         return observation, reward, self.done, info
 
     def render(self, mode='human', close=False):
-        print("You can see screen at http://localhost:8081/vnc.html")
         if mode == 'human':
-            cv2.imshow('test', self.prev_observation)
+            print("You can see screen at http://localhost:8081/vnc.html")
         else:
             print("Info: {}".format(self.prev_info))
 
-    def close(self):
-        self.screen.close()
+    #def close(self):
+    #    self.screen.close()
 
     def _observe(self):
         frame, fps = self.screen.get()
         # resolution = 512x512 grayscale, 
         observation = frame[:, :, :3]
         # remove background color
-        damage, diff_damage, kill = self._get_damage(observation)
+        #damage, diff_damage, kill = self._get_damage(observation)
+        damage, diff_damage, kill = (10, 10), (10, 5), (False, False)
         # get damege
         return observation, {"damage": damage, "diff_damage": diff_damage, "kill": kill}
 

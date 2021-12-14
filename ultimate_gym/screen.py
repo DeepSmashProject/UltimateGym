@@ -1,15 +1,25 @@
-from libultimate import Screen as YuzuScreen
-from threading import (Event)
+from libultimate import UltimateClient
+import threading
 
-class Screen(YuzuScreen):
-    def __init__(self, fps=60):
-        super().__init__(self._callback, fps=fps)
+class Screen:
+    def __init__(self, fps=60, address="http://localhost:6000", render=False, width=256, height=256) -> None:
+        self.fps = fps
+        self.render = render
+        self.width = width
+        self.height = height
         self.current_frame = None
         self.current_fps = 0
-        self.event = Event()
+        self.event = threading.Event()
+        self.client = UltimateClient(address=address, disable_warning=True)
+
+    def run(self):
+        thread = threading.Thread(target=self._run)
+        thread.start()
+
+    def _run(self):
+        self.client.run_screen(self._callback, fps=self.fps, render=self.render, width=self.width, height=self.height)
 
     def _callback(self, frame, fps):
-        #print("callback!", frame[0][0], fps)
         self.current_frame = frame
         self.current_fps = fps
         self.event.set()
