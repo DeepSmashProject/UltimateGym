@@ -46,7 +46,7 @@ action_list = [
     Action.ACTION_NO_OPERATION
 ]
 
-screen = Screen(fps=30, addres="http://localhost:6000")
+screen = Screen(fps=30, addres="http://localhost:6000", width=800, height=500)
 controller = Controller(addres="http://localhost:6000")
 
 env = UltimateEnv(screen, controller)
