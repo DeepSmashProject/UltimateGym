@@ -60,10 +60,3 @@ for k in range(10):
         print("episode: {}, step: {}, action: {}, obs: {}, done: {}, reward: {}, damage: {}, diff_damage: {}, kill: {}".format(k, step, action["name"], next_obs[100][100], done, reward, info["damage"], info["diff_damage"], info["kill"]))
         step += 1
 print("finished!")
-
-
-'''ACTION_RIGHT_ROLL
-ACTION_SPOT_DODGE
-ACTION_NO_OPERATION
-ACTION_LEFT_TILT
-ACTION_JUMP'''
