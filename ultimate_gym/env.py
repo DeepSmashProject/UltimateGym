@@ -1,5 +1,5 @@
 
-from libultimate import Action
+from libultimate.enums import Action
 from .screen import Screen
 from .controller import Controller
 import gym

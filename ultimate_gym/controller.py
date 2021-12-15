@@ -1,4 +1,5 @@
-from libultimate import UltimateClient, Action, Stage, Fighter
+from libultimate.client import UltimateClient
+from libultimate.enums import Action
 from threading import (Event)
 
 class Controller:

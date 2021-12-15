@@ -1,6 +1,6 @@
 
 from ultimate_gym import Screen, UltimateEnv, Controller
-from libultimate import Action
+from libultimate.enums import Action
 import time
 import random
 import argparse
@@ -46,8 +46,8 @@ action_list = [
     Action.ACTION_NO_OPERATION
 ]
 
-screen = Screen(fps=30, addres="http://localhost:6000", width=800, height=500)
-controller = Controller(addres="http://localhost:6000")
+screen = Screen(fps=30, address="http://localhost:6000", width=800, height=500)
+controller = Controller(address="http://localhost:6000")
 
 env = UltimateEnv(screen, controller)
 for k in range(10):

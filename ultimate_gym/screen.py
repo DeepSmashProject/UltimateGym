@@ -1,4 +1,4 @@
-from libultimate import UltimateClient
+from libultimate.client import UltimateClient
 import threading
 
 class Screen:
