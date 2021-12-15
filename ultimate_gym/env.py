@@ -118,18 +118,10 @@ class UltimateEnv(gym.Env):
         else:
             print("Info: {}".format(self.prev_info))
 
-    #def close(self):
-    #    self.screen.close()
-
     def _observe(self):
         frame, fps, info = self.screen.get()
-        # resolution = 512x512 grayscale, 
-        observation = frame[:, :, :3]
-        # remove background color
-        #damage, diff_damage, kill = self._get_damage(observation)
-        #damage, diff_damage, kill = (10, 10), (10, 5), (False, False)
-        # get damege
-        return observation, info
+        # frame (width, height, 1 if gray_scale else 3)
+        return frame, info
 
     def _done(self, info):
         done = False
@@ -141,50 +133,4 @@ class UltimateEnv(gym.Env):
         p1_diff_damage = info["diff_damage"][0]
         p2_diff_damage = info["diff_damage"][1]
         reward = p2_diff_damage - p1_diff_damage
-
-        #reward = -1 if info["kill"][0] == True else reward
-        #reward = 1 if info["kill"][1] == True else reward
         return reward
-
-    def _get_damage(self, observation):
-        # read damage from observation
-        #p1_damage_obs = (observation[414:444, 127:151], observation[414:444, 149:173], observation[414:444, 171:195]) #[y,x]
-        #p2_damage_obs = (observation[414:444, 309:333], observation[414:444, 331:355], observation[414:444, 353:377]) #[y,x] 
-        p1_damage_obs = (observation[411:441, 124:148], observation[411:441, 146:170], observation[411:441, 168:192]) #[y,x]
-        p2_damage_obs = (observation[411:441, 306:330], observation[411:441, 328:352], observation[411:441, 350:374]) #[y,x] 
-        p1_damage = self.model.predict_damage(p1_damage_obs)
-        p2_damage = self.model.predict_damage(p2_damage_obs)
-        self.p1_d_buffer.append(p1_damage)
-        self.p2_d_buffer.append(p2_damage)
-        p1_diff_damage = 0
-        p2_diff_damage = 0
-        p1_killed = False
-        p2_killed = False
-        if self.p1_d_buffer.count(self.p1_damage) == 0 and self.p1_d_buffer.count(999) == 0 and p1_damage != self.p1_damage:
-            p1_diff_damage = p1_damage - self.p1_damage
-            if p1_diff_damage > 0:
-                self.p1_damage = p1_damage
-            else:
-                p1_diff_damage = 0
-            # kill or not
-            if self.p1_damaged_or_killed_flag and p1_damage == 0:
-                p1_killed = True
-                self.p1_damage = 0
-        if self.p2_d_buffer.count(self.p2_damage) == 0 and self.p2_d_buffer.count(999) == 0 and p2_damage != self.p2_damage:
-            p2_diff_damage = p2_damage - self.p2_damage
-            if p2_diff_damage > 0:
-                self.p2_damage = p2_damage
-            else:
-                p2_diff_damage = 0
-            # kill or not
-            if self.p2_damaged_or_killed_flag and p2_damage == 0:
-                p2_killed = True
-                self.p2_damage = 0
-
-        # killed flag
-        if self.p1_d_buffer.count(999) >= len(self.p1_d_buffer):
-            self.p1_damaged_or_killed_flag = True
-        if self.p2_d_buffer.count(999) >= len(self.p2_d_buffer):
-            self.p2_damaged_or_killed_flag = True
-            
-        return (self.p1_damage, self.p2_damage), (p1_diff_damage, p2_diff_damage), (p1_killed, p2_killed)
