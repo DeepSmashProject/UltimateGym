@@ -122,14 +122,14 @@ class UltimateEnv(gym.Env):
     #    self.screen.close()
 
     def _observe(self):
-        frame, fps = self.screen.get()
+        frame, fps, info = self.screen.get()
         # resolution = 512x512 grayscale, 
         observation = frame[:, :, :3]
         # remove background color
         #damage, diff_damage, kill = self._get_damage(observation)
-        damage, diff_damage, kill = (10, 10), (10, 5), (False, False)
+        #damage, diff_damage, kill = (10, 10), (10, 5), (False, False)
         # get damege
-        return observation, {"damage": damage, "diff_damage": diff_damage, "kill": kill}
+        return observation, info
 
     def _done(self, info):
         done = False

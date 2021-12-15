@@ -10,6 +10,7 @@ class Screen:
         self.grayscale = grayscale
         self.current_frame = None
         self.current_fps = 0
+        self.current_info = {}
         self.event = threading.Event()
         self.client = UltimateClient(address=address, disable_warning=True)
 
@@ -20,12 +21,13 @@ class Screen:
     def _run(self):
         self.client.run_screen(self._callback, fps=self.fps, render=self.render, width=self.width, height=self.height, grayscale=self.grayscale)
 
-    def _callback(self, frame, fps):
+    def _callback(self, frame, fps, info):
         self.current_frame = frame
         self.current_fps = fps
+        self.current_info = info
         self.event.set()
 
     def get(self):
         self.event.wait()
         self.event.clear()
-        return self.current_frame, self.current_fps
+        return self.current_frame, self.current_fps, self.current_info
