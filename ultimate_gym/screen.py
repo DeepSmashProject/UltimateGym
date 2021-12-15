@@ -2,11 +2,12 @@ from libultimate.client import UltimateClient
 import threading
 
 class Screen:
-    def __init__(self, fps=60, address="http://localhost:6000", render=False, width=256, height=256) -> None:
+    def __init__(self, fps=60, address="http://localhost:6000", render=False, width=256, height=256, grayscale=False) -> None:
         self.fps = fps
         self.render = render
         self.width = width
         self.height = height
+        self.grayscale = grayscale
         self.current_frame = None
         self.current_fps = 0
         self.event = threading.Event()
@@ -17,7 +18,7 @@ class Screen:
         thread.start()
 
     def _run(self):
-        self.client.run_screen(self._callback, fps=self.fps, render=self.render, width=self.width, height=self.height)
+        self.client.run_screen(self._callback, fps=self.fps, render=self.render, width=self.width, height=self.height, grayscale=self.grayscale)
 
     def _callback(self, frame, fps):
         self.current_frame = frame
