@@ -24,7 +24,11 @@ action_list = [
     Action.ACTION_GRAB,
     Action.ACTION_SHIELD,
     Action.ACTION_JUMP,
+    Action.ACTION_RIGHT_JUMP,
+    Action.ACTION_LEFT_JUMP,
     Action.ACTION_SHORT_HOP,
+    Action.ACTION_RIGHT_SHORT_HOP,
+    Action.ACTION_LEFT_SHORT_HOP,
     #Action.ACTION_UP_TAUNT,
     #Action.ACTION_DOWN_TAUNT,
     #Action.ACTION_LEFT_TAUNT,
@@ -32,20 +36,27 @@ action_list = [
     Action.ACTION_SPOT_DODGE,
     Action.ACTION_RIGHT_ROLL,
     Action.ACTION_LEFT_ROLL,
-    Action.ACTION_RIGHT_DASH,
-    Action.ACTION_LEFT_DASH,
-    Action.ACTION_RIGHT_WALK,
-    Action.ACTION_LEFT_WALK,
-    Action.ACTION_CROUCH,
+    #Action.ACTION_RIGHT_DASH,
+    #Action.ACTION_LEFT_DASH,
+    #Action.ACTION_RIGHT_WALK,
+    #Action.ACTION_LEFT_WALK,
+    #Action.ACTION_CROUCH,
     #Action.ACTION_RIGHT_CRAWL,
     #Action.ACTION_LEFT_CRAWL,
     Action.ACTION_RIGHT_STICK,
     Action.ACTION_LEFT_STICK,
     Action.ACTION_UP_STICK,
     Action.ACTION_DOWN_STICK,
-    Action.ACTION_NO_OPERATION
+    #Action.ACTION_NO_OPERATION
 ]
-
+action_list2 = [
+    Action.ACTION_JUMP,
+    Action.ACTION_RIGHT_JUMP,
+    Action.ACTION_LEFT_JUMP,
+    Action.ACTION_SHORT_HOP,
+    Action.ACTION_RIGHT_SHORT_HOP,
+    Action.ACTION_LEFT_SHORT_HOP,
+]
 screen = Screen(fps=30, address="http://localhost:6000", width=256, height=256, grayscale=False)
 controller = Controller(address="http://localhost:6000")
 
