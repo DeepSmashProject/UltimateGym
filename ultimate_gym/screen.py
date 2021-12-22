@@ -6,7 +6,6 @@ class Screen:
         self.fps = fps
         self.current_frame = None
         self.current_fps = 0
-        self.current_info = {}
         self.screen = YuzuScreen(callback=self._callback, fps=fps, disable_warning=disable_warning)
         self.event = threading.Event()
 
@@ -17,13 +16,12 @@ class Screen:
     def _run(self):
         self.screen.run()
 
-    def _callback(self, frame, fps, info):
+    def _callback(self, frame, fps):
         self.current_frame = frame
         self.current_fps = fps
-        self.current_info = info
         self.event.set()
 
     def get(self):
         self.event.wait()
         self.event.clear()
-        return self.current_frame, self.current_fps, self.current_info
+        return self.current_frame, self.current_fps
