@@ -1,7 +1,5 @@
-
-from libultimate.enums import Action
 from .screen import Screen
-from .controller import Controller
+from yuzulib.game.ssbu import Action, UltimateController
 import gym
 import numpy as np
 import cv2
@@ -67,7 +65,7 @@ action_list = [
 ]
 
 class UltimateEnv(gym.Env):
-    def __init__(self, screen: Screen, controller: Controller):
+    def __init__(self, fps=60):
         super().__init__()
         self.action_space = gym.spaces.Discrete(len(action_list)) 
 
@@ -83,10 +81,10 @@ class UltimateEnv(gym.Env):
         self.p2_damage = 0
         self.p1_damaged_or_killed_flag = False
         self.p2_damaged_or_killed_flag = False
-        self.screen = screen
+        self.screen = Screen(fps=fps)
         self.screen.run()
         time.sleep(1) # waiting run screen thread
-        self.controller = controller
+        self.controller = UltimateController()
         self.prev_observation = self.reset()
 
     def reset(self, without_reset=False):

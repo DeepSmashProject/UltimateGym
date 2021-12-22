@@ -1,6 +1,6 @@
 
-from ultimate_gym import Screen, UltimateEnv, Controller
-from libultimate.enums import Action
+from ultimate_gym import UltimateEnv
+from yuzulib.game.ssbu import Action
 import time
 import random
 import argparse
@@ -57,10 +57,7 @@ action_list2 = [
     Action.ACTION_RIGHT_SHORT_HOP,
     Action.ACTION_LEFT_SHORT_HOP,
 ]
-screen = Screen(fps=30, address="http://localhost:6000", width=256, height=256, grayscale=False)
-controller = Controller(address="http://localhost:6000")
-
-env = UltimateEnv(screen, controller)
+env = UltimateEnv(fps=6)
 for k in range(10):
     done = False
     obs = env.reset()
