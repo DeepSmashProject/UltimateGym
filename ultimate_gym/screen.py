@@ -1,8 +1,6 @@
 from yuzulib import Screen
 import threading
 
-from yuzulib.screen import callback
-
 class Screen:
     def __init__(self, fps=60, disable_warning=False) -> None:
         self.fps = fps
