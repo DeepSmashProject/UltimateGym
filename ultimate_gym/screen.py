@@ -1,4 +1,4 @@
-from yuzulib import Screen
+from yuzulib import Screen as YuzuScreen
 import threading
 
 class Screen:
@@ -7,7 +7,7 @@ class Screen:
         self.current_frame = None
         self.current_fps = 0
         self.current_info = {}
-        self.screen = Screen(callback=self._callback, fps=fps, disable_warning=disable_warning)
+        self.screen = YuzuScreen(callback=self._callback, fps=fps, disable_warning=disable_warning)
         self.event = threading.Event()
 
     def run(self):
