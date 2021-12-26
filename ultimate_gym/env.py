@@ -64,6 +64,42 @@ action_list = [
     Action.ACTION_NO_OPERATION
 ]
 
+class Buffer:
+    def __init__(self, capacity) -> None:
+        self.data = []
+        self.capacity = capacity
+
+    def add(self, value):
+        self.data.append(value)
+        if len(self.data) > self.capacity:
+            self.data.pop(0)
+
+    def is_full_value(self, value):
+        return self.data.count(value) == len(self.data)
+
+    def is_full_capacity(self):
+        return len(self.data) == self.capacity
+
+    def get_full_same_value(self):
+        if not self.is_full_capacity():
+            return -1
+        for d in self.data:
+            if d != self.data[0]:
+                return -1
+        return self.data[0]
+
+    def count_value_from_back(self, value):
+        count = 0
+        for v in reversed(self.data):
+            if v == value:
+                count += 1
+            else:
+                break
+        return count
+
+    def clear(self):
+        self.data = []
+
 class UltimateEnv(gym.Env):
     def __init__(self, fps=60):
         super().__init__()
@@ -74,9 +110,12 @@ class UltimateEnv(gym.Env):
         self.model = NetV5().to(device)
         self.model.load()
 
-        self.buffer_size = 2
-        self.p1_d_buffer = deque([], self.buffer_size)
-        self.p2_d_buffer = deque([], self.buffer_size)
+        self.buffer_size = 10
+        self.p1_d_buffer = Buffer(self.buffer_size)
+        self.p2_d_buffer = Buffer(self.buffer_size)
+        self.recent_buffer_size = 3
+        self.p1_recent_d_buffer = Buffer(self.recent_buffer_size)
+        self.p2_recent_d_buffer = Buffer(self.recent_buffer_size)
         self.p1_damage = 0
         self.p2_damage = 0
         self.p1_damaged_or_killed_flag = False
@@ -143,38 +182,36 @@ class UltimateEnv(gym.Env):
         p2_damage_obs = (observation[411:441, 306:330], observation[411:441, 328:352], observation[411:441, 350:374]) #[y,x] 
         p1_damage = self.model.predict_damage(p1_damage_obs)
         p2_damage = self.model.predict_damage(p2_damage_obs)
-        self.p1_d_buffer.append(p1_damage)
-        self.p2_d_buffer.append(p2_damage)
+        self.p1_d_buffer.add(p1_damage)
+        self.p2_d_buffer.add(p2_damage)
+        self.p1_recent_d_buffer.add(p1_damage)
+        self.p2_recent_d_buffer.add(p2_damage)
         p1_diff_damage = 0
         p2_diff_damage = 0
         p1_killed = False
         p2_killed = False
-        if self.p1_d_buffer.count(self.p1_damage) == 0 and self.p1_d_buffer.count(999) == 0 and p1_damage != self.p1_damage:
-            p1_diff_damage = p1_damage - self.p1_damage
-            if p1_diff_damage > 0:
-                self.p1_damage = p1_damage
-            else:
-                p1_diff_damage = 0
+        if p1_damage == 999:
+            self.p1_damaged_or_killed_flag = True
+        if p2_damage == 999:
+            self.p2_damaged_or_killed_flag = True
+        if self.p1_recent_d_buffer.get_full_same_value() != -1:
             # kill or not
-            if self.p1_damaged_or_killed_flag and p1_damage == 0:
+            if self.p1_damaged_or_killed_flag and self.p1_recent_d_buffer.is_full_value(0) and ((self.p2_damage == 0 and self.p1_d_buffer.count_value_from_back(0) < self.p2_d_buffer.count_value_from_back(0)) or (self.p2_damage != 0 and self.p2_recent_d_buffer.get_full_same_value() != -1 and self.p2_recent_d_buffer.get_full_same_value() != 999)):
                 p1_killed = True
                 self.p1_damage = 0
-        if self.p2_d_buffer.count(self.p2_damage) == 0 and self.p2_d_buffer.count(999) == 0 and p2_damage != self.p2_damage:
-            p2_diff_damage = p2_damage - self.p2_damage
-            if p2_diff_damage > 0:
-                self.p2_damage = p2_damage
-            else:
-                p2_diff_damage = 0
-            # kill or not
-            if self.p2_damaged_or_killed_flag and p2_damage == 0:
+                self.p1_damaged_or_killed_flag = False
+            # calc damage
+            elif not self.p1_recent_d_buffer.is_full_value(999) and self.p1_damage < self.p1_recent_d_buffer.get_full_same_value():
+                p1_diff_damage = p1_damage - self.p1_damage
+                self.p1_damage = p1_damage
+        if self.p2_recent_d_buffer.get_full_same_value() != -1:
+            if self.p2_damaged_or_killed_flag and self.p2_recent_d_buffer.is_full_value(0) and ((self.p1_damage == 0 and self.p2_d_buffer.count_value_from_back(0) < self.p1_d_buffer.count_value_from_back(0)) or (self.p1_damage != 0 and self.p1_recent_d_buffer.get_full_same_value() != -1 and self.p1_recent_d_buffer.get_full_same_value() != 999)):
                 p2_killed = True
                 self.p2_damage = 0
-
-        # killed flag
-        if self.p1_d_buffer.count(999) >= len(self.p1_d_buffer):
-            self.p1_damaged_or_killed_flag = True
-        if self.p2_d_buffer.count(999) >= len(self.p2_d_buffer):
-            self.p2_damaged_or_killed_flag = True
+                self.p2_damaged_or_killed_flag = False
+            elif not self.p2_recent_d_buffer.is_full_value(999) and self.p2_damage < self.p2_recent_d_buffer.get_full_same_value():
+                p2_diff_damage = p2_damage - self.p2_damage
+                self.p2_damage = p2_damage
             
         return (self.p1_damage, self.p2_damage), (p1_diff_damage, p2_diff_damage), (p1_killed, p2_killed)
 
