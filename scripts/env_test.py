@@ -21,6 +21,8 @@ action_list = [
     Action.ACTION_LEFT_SPECIAL,
     Action.ACTION_UP_SPECIAL,
     Action.ACTION_DOWN_SPECIAL,
+    Action.ACTION_UP_RIGHT_SPECIAL,
+    Action.ACTION_UP_LEFT_SPECIAL,
     Action.ACTION_GRAB,
     Action.ACTION_SHIELD,
     Action.ACTION_JUMP,
